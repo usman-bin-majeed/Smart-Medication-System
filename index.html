@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MediScan - Smart Medication Management</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style> 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --dark: #2d3748;
+            --light: #f7fafc;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .nav-links a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.8));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #38a169);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #e53e3e);
+            color: white;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Medication Schedule */
+        .med-schedule {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .med-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .med-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .med-item:last-child {
+            border-bottom: none;
+        }
+
+        .med-info h4 {
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .med-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .med-time {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        .taken {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        /*Medication grids and cards*/
+        /* Add to your existing <style> tag */
+        .medication-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .medication-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .medication-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .medication-card .card-body {
+    padding: 1.5rem;
+}
+
+.medication-card .card-title {
+    color: var(--primary);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.medication-card .card-text {
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.medication-card .btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.medication-card .btn-group button {
+    flex: 1;
+    padding: 0.5rem 1rem;
+}
+
+
+
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Progress Bar */
+        .progress {
+            background: #e2e8f0;
+            border-radius: 50px;
+            height: 12px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 50px;
+            transition: width 0.6s ease;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease;
+        }
+
+        /* Emergency Button */
+        .emergency-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--danger), #e53e3e);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(245, 101, 101, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .emergency-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(245, 101, 101, 0.6);
+        }
+
+        /* Page Transitions */
+        .page {
+            display: none;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Pharmacy Search Results */
+        .pharmacy-result {
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .pharmacy-result:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Rating System */
+        .rating {
+            display: flex;
+            gap: 0.25rem;
+            margin: 0.5rem 0;
+        }
+
+        .star {
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .star.active {
+            color: #ffd700;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        .toast.warning {
+            background: var(--warning);
+        }
+
+        /* Loading Spinner*/
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .modal-content {
+        position: relative;  /* Add this to ensure proper spinner positioning */
+    }
+
+    /*time slots*/
+    /* Add to your existing <style> tag */
+.time-slot-btn {
+    padding: 8px;
+    margin: 4px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    color: #4a5568;
+    min-width: 70px;
+    position: relative;
+    overflow: hidden;
+}
+
+.time-slot-btn:hover {
+    border-color: var(--primary);
+    background: #f0f5ff;
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+.time-slot-btn.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#timeSlots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f8fafc;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-pills"></i> MediScan
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#" onclick="showPage('home')"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#" onclick="showPage('medications')"><i class="fas fa-capsules"></i> Medications</a></li>
+                <li><a href="#" onclick="showPage('symptoms')"><i class="fas fa-heart-pulse"></i> Symptoms</a></li>
+                <li><a href="#" onclick="showPage('pharmacies')"><i class="fas fa-store"></i> Pharmacies</a></li>
+                <li><a href="#" onclick="showPage('profile')"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <div class="hero">
+            <div class="container">
+                <h1 class="fade-in-up">Smart Medication Management</h1>
+                <p class="fade-in-up">Take control of your health with MediScan's intelligent medication tracking and reminder system.</p>
+                <div class="fade-in-up">
+                    <a href="#" onclick="showPage('login')" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="dashboard-grid">
+                <div class="card fade-in-up">
+                    <i class="fas fa-clock" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                    <h3>Smart Reminders</h3>
+                    <p>Never miss a dose with intelligent medication reminders that adapt to your schedule.</p>
+                </div>
+                <div class="card fade-in-up">
+                    <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
+                    <h3>Progress Tracking</h3>
+                    <p>Monitor your medication compliance and health improvements with detailed analytics.</p>
+                </div>
+                <div class="card fade-in-up">
+                    <i class="fas fa-users" style="font-size: 3rem; color: var(--secondary); margin-bottom: 1rem;"></i>
+                    <h3>Guardian Connect</h3>
+                    <p>Keep your loved ones informed with secure guardian access and notifications.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login" class="page">
+        <div class="container">
+            <div class="card" style="max-width: 400px; margin: 4rem auto;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">
+                    <i class="fas fa-user-circle"></i> Login
+                </h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 1rem;">
+                    Don't have an account? <a href="#" onclick="showPage('register')" style="color: var(--primary);">Register here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register" class="page">
+        <div class="container">
+            <div class="card" style="max-width: 500px; margin: 2rem auto;">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">
+                    <i class="fas fa-user-plus"></i> Register
+                </h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regName">Full Name</label>
+                        <input type="text" id="regName" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" class="form-control" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="regRole">Role</label>
+                        <select id="regRole" class="form-control" required onchange="toggleRoleFields()">
+                            <option value="">Select Role</option>
+                            <option value="patient">Patient</option>
+                            <option value="guardian">Guardian</option>
+                            <option value="pharmacy">Pharmacy</option>
+                        </select>
+                    </div>
+
+                    <!-- Patient specific fields -->
+                    <div id="patientFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="regAge">Age</label>
+                            <input type="number" id="regAge" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="regGender">Gender</label>
+                            <select id="regGender" class="form-control">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regAllergies">Allergies (comma separated)</label>
+                            <input type="text" id="regAllergies" class="form-control" placeholder="e.g., Penicillin, Shellfish" />
+                        </div>
+                        <div class="form-group">
+                            <label for="regConditions">Medical Conditions (comma separated)</label>
+                            <input type="text" id="regConditions" class="form-control" placeholder="e.g., Diabetes, Hypertension" />
+                        </div>
+                    </div>
+
+                    <!-- Guardian specific fields -->
+                    <div id="guardianFields" style="display: none;">
+                        <div class="form-group">
+                            <label for="regPhone">Phone Number</label>
+                            <input type="tel" id="regPhone" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label for="regRelationship">Relationship</label>
+                            <input type="text" id="regRelationship" class="form-control" placeholder="e.g., Spouse, Parent, Child" />
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-user-plus"></i> Register
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 1rem;">
+                    Already have an account? <a href="#" onclick="showPage('login')" style="color: var(--primary);">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page">
+        <div class="container">
+            <h1 style="color: white; margin-bottom: 2rem;">Dashboard</h1>
+
+            <!-- Stats Cards -->
+            <div class="dashboard-grid" style="margin-bottom: 3rem;">
+                <div class="stat-card fade-in-up">
+                    <div class="stat-number" id="complianceRate">85%</div>
+                    <div class="stat-label">Compliance Rate</div>
+                </div>
+                <div class="stat-card fade-in-up">
+                    <div class="stat-number" id="todayMeds">3</div>
+                    <div class="stat-label">Today's Medications</div>
+                </div>
+                <div class="stat-card fade-in-up">
+                    <div class="stat-number" id="nextMedTime">14:30</div>
+                    <div class="stat-label">Next Medication</div>
+                </div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="card fade-in-up">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-calendar-day"></i> Today's Schedule
+                </h3>
+                <div class="med-schedule" id="todaySchedule"></div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card fade-in-up">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h3>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="showPage('medications')">
+                        <i class="fas fa-plus"></i> Add Medication
+                    </button>
+                    <button class="btn btn-success" onclick="showPage('symptoms')">
+                        <i class="fas fa-heart-pulse"></i> Log Symptoms
+                    </button>
+                    <button class="btn btn-primary" onclick="showPage('pharmacies')">
+                        <i class="fas fa-search"></i> Find Pharmacy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medications Page -->
+    <div id="medications" class="page">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="color: white;">My Medications</h1>
+                <button class="btn btn-primary" onclick="showModal('addMedicationModal', false)">
+                    <i class="fas fa-plus"></i> Add Medication
+                </button>
+            </div>
+
+            <!-- Medications list container -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card fade-in-up">
+                    <div id="medicationsList" class="medication-grid">
+                        <!-- Medications will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Symptoms Page -->
+    <div id="symptoms" class="page">
+        <div class="container">
+            <h1 style="color: white; margin-bottom: 2rem;">Symptom Tracking</h1>
+
+            <div class="card fade-in-up">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-heart-pulse"></i> How are you feeling today?
+                </h3>
+                <form id="symptomsForm">
+                    <div class="form-group">
+                        <label>Mood (1-10)</label>
+                        <div class="rating" data-rating="mood">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                            <span class="star" data-value="6">★</span>
+                            <span class="star" data-value="7">★</span>
+                            <span class="star" data-value="8">★</span>
+                            <span class="star" data-value="9">★</span>
+                            <span class="star" data-value="10">★</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Energy Level (1-10)</label>
+                        <div class="rating" data-rating="energy">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                            <span class="star" data-value="6">★</span>
+                            <span class="star" data-value="7">★</span>
+                            <span class="star" data-value="8">★</span>
+                            <span class="star" data-value="9">★</span>
+                            <span class="star" data-value="10">★</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Pain Level (1-10)</label>
+                        <div class="rating" data-rating="pain">
+                            <span class="star" data-value="1">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="5">★</span>
+                            <span class="star" data-value="6">★</span>
+                            <span class="star" data-value="7">★</span>
+                            <span class="star" data-value="8">★</span>
+                            <span class="star" data-value="9">★</span>
+                            <span class="star" data-value="10">★</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sideEffects">Side Effects</label>
+                        <input
+                            type="text"
+                            id="sideEffects"
+                            class="form-control"
+                            placeholder="Any side effects you're experiencing"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="symptomsNotes">Notes</label>
+                        <textarea
+                            id="symptomsNotes"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Any additional notes about how you're feeling"
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Log Symptoms
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pharmacies Page -->
+    <div id="pharmacies" class="page">
+        <div class="container">
+            <h1 style="color: white; margin-bottom: 2rem;">Find Pharmacies</h1>
+
+            <div class="card fade-in-up">
+                <h3 style="margin-bottom: 1.5rem; color: var(--primary);">
+                    <i class="fas fa-search"></i> Search by Medication
+                </h3>
+                <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                    <input
+                        type="text"
+                        id="medicationSearch"
+                        class="form-control"
+                        placeholder="Enter medication name"
+                    />
+                    <button class="btn btn-primary" onclick="searchPharmacies()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+
+                <div id="pharmacyResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="profile" class="page">
+        <div class="container">
+            <h1 style="color: white; margin-bottom: 2rem;">Profile</h1>
+
+            <div class="dashboard-grid">
+                <div class="card fade-in-up">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">
+                        <i class="fas fa-user"></i> Personal Information
+                    </h3>
+                    <p><strong>Name:</strong> <span id="profileName">John Doe</span></p>
+                    <p><strong>Email:</strong> <span id="profileEmail">john.doe@example.com</span></p>
+                    <p><strong>Age:</strong> <span id="profileAge">35</span></p>
+                    <p><strong>Gender:</strong> <span id="profileGender">Male</span></p>
+                    <button class="btn btn-primary" onclick="editProfile()">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+
+                <div class="card fade-in-up">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Medical Information
+                    </h3>
+                    <p><strong>Allergies:</strong> <span id="profileAllergies">Penicillin</span></p>
+                    <p><strong>Conditions:</strong> <span id="profileConditions">Diabetes, Hypertension</span></p>
+                    <p><strong>Guardian Code:</strong> <span id="profileGuardianCode">123456</span></p>
+                    <button class="btn btn-primary" onclick="editMedicalInfo()">
+                        <i class="fas fa-edit"></i> Update Medical Info
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Medication Modal -->
+    <!-- <div id="addMedicationModal" class="modal">
+        <div class="modal-content">
+            <div
+                style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                "
+            >
+                <h3 style="color: var(--primary)">
+                    <i class="fas fa-plus"></i> Add New Medication
+                </h3>
+                <button
+                    onclick="closeModal('addMedicationModal')"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer"
+                >
+                    ×
+                </button>
+            </div>
+
+            <form id="addMedicationForm">
+                <div class="form-group">
+                    <label for="medName">Medication Name</label>
+                    <input type="text" id="medName" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="medDosage">Dosage</label>
+                    <input
+                        type="text"
+                        id="medDosage"
+                        class="form-control"
+                        placeholder="e.g., 500mg"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="medFrequency">Frequency</label>
+                    <select id="medFrequency" class="form-control" required>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="as_needed">As Needed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Times (click to add/remove)</label>
+                    <div
+                        id="timeSlots"
+                        style="
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 0.5rem;
+                            margin-top: 0.5rem;
+                        "
+                    ></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="medNotes">Notes</label>
+                    <textarea
+                        id="medNotes"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Any special instructions or notes"
+                    ></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end">
+                    <button
+                        type="button"
+                        class="btn"
+                        onclick="closeModal('addMedicationModal')"
+                        style="background: #e2e8f0"
+                    >
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Add Medication
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div> -->
+
+    <!-- ------Hadi------- -->
+     <!-- Replace the existing Add Medication Modal with this updated version -->
+<!-- Add Medication Modal -->
+<div id="addMedicationModal" class="modal">
+    <div class="modal-content" style="max-height: 90vh; width: 90%; max-width: 600px;">
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000;">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div class="spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div style="color: var(--primary);">Loading...</div>
+            </div>
+        </div>
+        <!-- Fixed Header -->
+        <div style="padding: 1rem; border-bottom: 1px solid #e2e8f0; background: white; position: sticky; top: 0; z-index: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="color: var(--primary); margin: 0;">
+                    <i class="fas fa-plus"></i> Add New Medication
+                </h3>
+                <button onclick="closeModal('addMedicationModal')" 
+                        style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">
+                    ×
+                </button>
+            </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div style="overflow-y: auto; padding: 1rem; max-height: calc(90vh - 130px);">
+            <form id="addMedicationForm">
+                <input type = "hidden" id="medicationId" value="" />
+                <div class="form-group">
+                    <label for="medName">Medication Name*</label>
+                    <input type="text" id="medName" class="form-control" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="medDosage">Dosage*</label>
+                    <input type="text" id="medDosage" class="form-control" 
+                           placeholder="e.g., 500mg" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="medFrequency">Frequency*</label>
+                    <select id="medFrequency" class="form-control" required>
+                        <option value="">Select frequency</option>
+                        <option value="daily">Daily</option>
+                        <option value="twice_daily">Twice Daily</option>
+                        <option value="three_times_daily">Three Times Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="as_needed">As Needed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Times* (click to select)</label>
+                    <div id="timeSlots" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="medNotes">Notes</label>
+                    <textarea id="medNotes" class="form-control" rows="3" 
+                              placeholder="Any special instructions or notes"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="sideEffects">Potential Side Effects</label>
+                    <textarea id="sideEffects" class="form-control" rows="2"
+                              placeholder="List any potential side effects"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="storage">Storage Instructions</label>
+                    <input type="text" id="storage" class="form-control"
+                           placeholder="e.g., Store in a cool, dry place" />
+                </div>
+
+                <div class="form-group">
+                    <label for="refillDate">Next Refill Date</label>
+                    <input type="date" id="refillDate" class="form-control" />
+                </div>
+            </form>
+        </div>
+
+        <!-- Fixed Footer -->
+        <div style="padding: 1rem; border-top: 1px solid #e2e8f0; background: white; position: sticky; bottom: 0;">
+            <div style="display: flex; gap: 1rem; justify-content: flex-end">
+                <button type="button" class="btn" onclick="closeModal('addMedicationModal')" 
+                        style="background: #e2e8f0">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success" onclick="submitMedicationForm()">
+                    <i class="fas fa-save"></i> Add Medication
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Emergency Button -->
+    <button class="emergency-btn" onclick="showEmergencyModal()" title="Emergency">
+        <i class="fas fa-exclamation"></i>
+    </button>
+
+    <!-- Emergency Modal -->
+    <div id="emergencyModal" class="modal">
+        <div class="modal-content" style="text-align: center; color: var(--danger)">
+            <i
+                class="fas fa-exclamation-triangle"
+                style="font-size: 3rem; margin-bottom: 1rem"
+            ></i>
+            <h2>Emergency Contacts</h2>
+
+            <div style="margin: 2rem 0">
+                <div
+                    style="
+                        padding: 1rem;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        margin-bottom: 1rem;
+                    "
+                >
+                    <h4>Emergency Services</h4>
+                    <p><strong>Phone:</strong> 911</p>
+                </div>
+
+                <div
+                    style="
+                        padding: 1rem;
+                        background: #f8f9fa;
+                        border-radius: 8px;
+                        margin-bottom: 1rem;
+                    "
+                >
+                    <h4>Primary Doctor</h4>
+                    <p><strong>Dr. Smith:</strong> (555) 123-4567</p>
+                </div>
+
+                <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px">
+                    <h4>Emergency Contact</h4>
+                    <p><strong>Jane Doe:</strong> (555) 987-6543</p>
+                </div>
+            </div>
+
+            <div
+                style="display: flex; gap: 1rem; justify-content: center"
+            >
+                <button class="btn btn-danger" onclick="callEmergency()">
+                    <i class="fas fa-phone"></i> Call 911
+                </button>
+                <button
+                    class="btn"
+                    onclick="closeModal('emergencyModal')"
+                    style="background: #e2e8f0"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // === Full dynamic JS code starts here ===
+        let currentUser = null;
+        let medicationRatings = { mood: 0, energy: 0, pain: 0 };
+        let selectedTimes = new Set();
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach((page) => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+
+            if (pageId === 'dashboard') {
+                loadDashboardData();
+            } else if (pageId === 'medications') {
+                loadMedications();
+            }
+        }
+
+        function showModal(modalId, isEdit=false) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+        // Reset form and clear selections
+                const form = document.getElementById('addMedicationForm');
+                form.reset();
+                document.getElementById('medicationId').value = '';
+                
+        // Clear all selected times
+                const timeSlots = document.querySelectorAll('#timeSlots button');
+                timeSlots.forEach(btn => btn.classList.remove('selected'));
+
+        // Update modal title based on mode
+                const modalTitle = modal.querySelector('h3');
+                const submitButton = modal.querySelector('button[type="button"].btn-success');
+        
+                if (modalTitle && submitButton) {
+                    if (isEdit) {
+                        modalTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Medication';
+                        submitButton.innerHTML = '<i class="fas fa-save"></i> Update Medication';
+                    } else {
+                        modalTitle.innerHTML = '<i class="fas fa-plus"></i> Add New Medication';
+                        submitButton.innerHTML = '<i class="fas fa-plus"></i> Add Medication';
+                    }
+                }
+
+                modal.style.display = 'block';
+            }
+        }
+
+        function editMedication(medicationId) {
+    fetch(`/api/medications/${medicationId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch medication details');
+            }
+            return response.json();
+        })
+        .then(medication => {
+            // Show modal in edit mode
+            showModal('addMedicationModal', true);
+            
+            // Populate form fields
+            document.getElementById('medicationId').value = medication._id;
+            document.getElementById('medName').value = medication.medication_name || '';
+            document.getElementById('medDosage').value = medication.dosage || '';
+            document.getElementById('medFrequency').value = medication.frequency || '';
+            document.getElementById('medNotes').value = medication.notes || '';
+            document.getElementById('sideEffects').value = medication.side_effects || '';
+            document.getElementById('storage').value = medication.storage || '';
+            document.getElementById('refillDate').value = medication.refill_date || '';
+
+            // Select times
+            const timeSlots = document.querySelectorAll('#timeSlots button');
+            timeSlots.forEach(btn => {
+                if (medication.times.includes(btn.dataset.time)) {
+                    btn.classList.add('selected');
+                }
+            });
+        })
+        .catch(error => {
+            alert('Error loading medication details: ' + error.message);
+        });
+    }
+
+        function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        // Reset form and selections
+        const form = document.getElementById('addMedicationForm');
+        if (form) {
+            form.reset();
+            document.getElementById('medicationId').value = '';
+            selectedTimes.clear();
+        }
+
+        // Reset time slots
+        const timeSlots = document.querySelectorAll('#timeSlots .time-slot-btn');
+        timeSlots.forEach(btn => btn.classList.remove('selected'));
+
+        // Hide modal
+        modal.style.display = 'none';
+    }
+}
+
+        function showEmergencyModal() {
+            showModal('emergencyModal');
+        }
+
+        // HADI
+        // Add this function in your <script> tag
+function submitMedicationForm() {
+    const form = document.getElementById('addMedicationForm');
+    
+    // Get time slots that are selected
+    const selectedTimes = Array.from(document.querySelectorAll('#timeSlots button.selected'))
+        .map(btn => btn.dataset.time);
+
+    const formData = {
+        medication_name: document.getElementById('medName').value.trim(),
+        dosage: document.getElementById('medDosage').value.trim(),
+        frequency: document.getElementById('medFrequency').value,
+        times: selectedTimes,
+        notes: document.getElementById('medNotes').value.trim(),
+        side_effects: document.getElementById('sideEffects')?.value.trim() || '',
+        storage: document.getElementById('storage')?.value.trim() || '',
+        refill_date: document.getElementById('refillDate')?.value || ''
+    };
+
+    // Validate required fields
+    if (!formData.medication_name || !formData.dosage || !formData.frequency) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    if (formData.times.length === 0) {
+        alert('Please select at least one time slot');
+        return;
+    }
+
+    // Send to backend
+    fetch('/add_medication', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Medication added successfully!');
+            closeModal('addMedicationModal');
+            form.reset();
+            // Refresh medications list
+            loadMedications();
+        } else {
+            throw new Error(data.error || 'Failed to add medication');
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+}
+
+    // Add this function in your <script> tag
+function loadMedications() {
+    fetch('/api/medications')
+        .then(response => response.json())
+        .then(medications => {
+            const medicationsList = document.getElementById('medicationsList');
+            if (!medicationsList) return;
+            
+            medicationsList.innerHTML = '';
+            medications.forEach(med => {
+                const card = createMedicationCard(med);
+                medicationsList.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Error loading medications:', error));
+}
+
+// function createMedicationCard(medication) {
+//     const col = document.createElement('div');
+//     col.className = 'col-md-4 mb-3';
+    
+//     col.innerHTML = `
+//         <div class="card">
+//             <div class="card-body">
+//                 <h5 class="card-title">${medication.medication_name}</h5>
+//                 <p class="card-text">
+//                     <strong>Dosage:</strong> ${medication.dosage}<br>
+//                     <strong>Frequency:</strong> ${medication.frequency}<br>
+//                     <strong>Times:</strong> ${medication.times.join(', ')}<br>
+//                     <strong>Notes:</strong> ${medication.notes || 'N/A'}
+//                 </p>
+//                 <div class="btn-group">
+//                     <button class="btn btn-sm btn-primary" onclick="editMedication('${medication._id}')">
+//                         Edit
+//                     </button>
+//                     <button class="btn btn-sm btn-danger" onclick="deleteMedication('${medication._id}')">
+//                         Delete
+//                     </button>
+//                 </div>
+//             </div>
+//         </div>
+//     `;
+    
+//     return col;
+// }
+
+// Update the createMedicationCard function in your <script> tag
+function createMedicationCard(medication) {
+    const card = document.createElement('div');
+    card.className = 'medication-card fade-in-up';
+    
+    card.innerHTML = `
+        <div class="card-body">
+            <h3 class="card-title">
+                <i class="fas fa-pills"></i> ${medication.medication_name}
+            </h3>
+            <div class="card-text">
+                <p><i class="fas fa-prescription-bottle"></i> <strong>Dosage:</strong> ${medication.dosage}</p>
+                <p><i class="fas fa-clock"></i> <strong>Frequency:</strong> ${medication.frequency}</p>
+                <p><i class="fas fa-calendar-alt"></i> <strong>Times:</strong> ${medication.times.join(', ')}</p>
+                ${medication.notes ? `<p><i class="fas fa-sticky-note"></i> <strong>Notes:</strong> ${medication.notes}</p>` : ''}
+                ${medication.side_effects ? `<p><i class="fas fa-exclamation-triangle"></i> <strong>Side Effects:</strong> ${medication.side_effects}</p>` : ''}
+                ${medication.storage ? `<p><i class="fas fa-box"></i> <strong>Storage:</strong> ${medication.storage}</p>` : ''}
+                ${medication.refill_date ? `<p><i class="fas fa-calendar-plus"></i> <strong>Next Refill:</strong> ${medication.refill_date}</p>` : ''}
+            </div>
+            <div class="btn-group" style="margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="editMedication('${medication._id}')">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger" onclick="deleteMedication('${medication._id}')">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    `;
+    
+    return card;
+}
+
+
+// Add to your existing <script> tag in index.html
+
+function editMedication(medicationId) {
+    showLoadingSpinner();
+    
+    fetch(`/api/medications/${medicationId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch medication details');
+            }
+            return response.json();
+        })
+        .then(medication => {
+            // Show modal in edit mode
+            showModal('addMedicationModal', true);
+            
+            // Populate form fields
+            document.getElementById('medicationId').value = medication._id;
+            document.getElementById('medName').value = medication.medication_name || '';
+            document.getElementById('medDosage').value = medication.dosage || '';
+            document.getElementById('medFrequency').value = medication.frequency || '';
+            document.getElementById('medNotes').value = medication.notes || '';
+            document.getElementById('sideEffects').value = medication.side_effects || '';
+            document.getElementById('storage').value = medication.storage || '';
+            document.getElementById('refillDate').value = medication.refill_date || '';
+
+            // Select time slots
+            const timeButtons = document.querySelectorAll('#timeSlots .time-slot-btn');
+            timeButtons.forEach(btn => {
+                if (medication.times.includes(btn.dataset.time)) {
+                    btn.classList.add('selected');
+                    selectedTimes.add(btn.dataset.time);
+                }
+            });
+
+            hideLoadingSpinner();
+        })
+        .catch(error => {
+            hideLoadingSpinner();
+            alert('Error loading medication details: ' + error.message);
+        });
+}
+
+// Add these helper functions
+function showLoadingSpinner() {
+    // You can add a loading spinner to your HTML and show/hide it
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) spinner.style.display = 'block';
+}
+
+function hideLoadingSpinner() {
+    const spinner = document.getElementById('loadingSpinner');
+    if (spinner) spinner.style.display = 'none';
+}
+
+function showModal(modalId, isEdit = false) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        // Reset form and selections
+        const form = document.getElementById('addMedicationForm');
+        form.reset();
+        document.getElementById('medicationId').value = '';
+        
+        // Initialize time slots
+        initializeTimeSlots();
+
+        // Update modal title and button text
+        const modalTitle = modal.querySelector('h3');
+        const submitButton = modal.querySelector('button[type="button"].btn-success');
+        
+        if (modalTitle && submitButton) {
+            if (isEdit) {
+                modalTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Medication';
+                submitButton.innerHTML = '<i class="fas fa-save"></i> Update Medication';
+            } else {
+                modalTitle.innerHTML = '<i class="fas fa-plus"></i> Add New Medication';
+                submitButton.innerHTML = '<i class="fas fa-plus"></i> Add Medication';
+            }
+        }
+
+        modal.style.display = 'block';
+    }
+}
+
+function deleteMedication(medicationId) {
+    if (confirm('Are you sure you want to delete this medication?')) {
+        fetch(`/api/medications/${medicationId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Medication deleted successfully');
+                loadMedications(); // Refresh the list
+            } else {
+                throw new Error(data.error || 'Failed to delete medication');
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
+}
+
+// Update the submitMedicationForm function to handle both add and edit
+function submitMedicationForm() {
+    const form = document.getElementById('addMedicationForm');
+    const medicationId = document.getElementById('medicationId').value;
+    
+    // Get selected times
+    const selectedTimes = Array.from(document.querySelectorAll('#timeSlots button.selected'))
+        .map(btn => btn.dataset.time);
+
+    const formData = {
+        medication_name: document.getElementById('medName').value.trim(),
+        dosage: document.getElementById('medDosage').value.trim(),
+        frequency: document.getElementById('medFrequency').value,
+        times: selectedTimes,
+        notes: document.getElementById('medNotes').value.trim(),
+        side_effects: document.getElementById('sideEffects').value.trim(),
+        storage: document.getElementById('storage').value.trim(),
+        refill_date: document.getElementById('refillDate').value
+    };
+
+    // Validate required fields
+    if (!formData.medication_name || !formData.dosage || !formData.frequency) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    if (formData.times.length === 0) {
+        alert('Please select at least one time');
+        return;
+    }
+
+    const url = medicationId ? 
+        `/api/medications/${medicationId}` : 
+        '/add_medication';
+    const method = medicationId ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(medicationId ? 'Medication updated successfully!' : 'Medication added successfully!');
+            closeModal('addMedicationModal');
+            loadMedications();
+        } else {
+            throw new Error(data.error || 'Failed to save medication');
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+}
+
+        // Updated login handler (handle JSON response)
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ email, password }),
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    currentUser = { email };
+                    showToast('Login successful!', 'success');
+                    showPage('dashboard');
+                    await loadDashboardData();
+                } else {
+                    showToast('Login failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
+            }
+        });
+
+        // Updated register handler (handle JSON response)
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+
+            if (!name || !email || !password || !role) {
+                showToast('Please fill all required fields', 'warning');
+                return;
+            }
+
+            let formData = new URLSearchParams();
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('role', role);
+
+            if (role === 'patient') {
+                formData.append('age', document.getElementById('regAge').value);
+                formData.append('gender', document.getElementById('regGender').value);
+                formData.append('allergies', document.getElementById('regAllergies').value);
+                formData.append('conditions', document.getElementById('regConditions').value);
+            } else if (role === 'guardian') {
+                formData.append('phone', document.getElementById('regPhone').value);
+                formData.append('relationship', document.getElementById('regRelationship').value);
+            }
+
+            try {
+                const res = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData,
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    showToast('Registration successful! Please login.', 'success');
+                    showPage('login');
+                } else {
+                    showToast('Registration failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
+            }
+        });
+
+        function logout() {
+            fetch('/logout')
+                .then(() => {
+                    currentUser = null;
+                    showToast('Logged out successfully', 'success');
+                    showPage('home');
+                })
+                .catch(() => {
+                    showToast('Logout failed', 'error');
+                });
+        }
+
+        function toggleRoleFields() {
+            const role = document.getElementById('regRole').value;
+            document.getElementById('patientFields').style.display = role === 'patient' ? 'block' : 'none';
+            document.getElementById('guardianFields').style.display = role === 'guardian' ? 'block' : 'none';
+        }
+
+        // --- Dashboard Data ---
+
+        async function loadDashboardData() {
+            try {
+                await loadTodaySchedule();
+                await updateStats();
+            } catch (error) {
+                showToast('Failed to load dashboard data: ' + error.message, 'error');
+            }
+        }
+
+        async function loadTodaySchedule() {
+            try {
+                const res = await fetch('/api/today_schedule');
+                if (!res.ok) throw new Error('Failed to fetch today schedule');
+                const schedule = await res.json();
+
+                const container = document.getElementById('todaySchedule');
+                container.innerHTML = '';
+
+                schedule.forEach((med) => {
+                    const medItem = document.createElement('div');
+                    medItem.className = `med-item ${med.taken ? 'taken' : ''}`;
+                    medItem.innerHTML = `
+                    <div class="med-info">
+                        <h4>${med.medication_name}</h4>
+                        <p>${med.dosage} ${med.notes ? '- ' + med.notes : ''}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div class="med-time">${med.time}</div>
+                        ${
+                            !med.taken
+                                ? `<button class="btn btn-success" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.8rem;" onclick="takeMedication('${med.medication_id}')">
+                        <i class="fas fa-check"></i> Take
+                    </button>`
+                                : '<div style="color: var(--success); margin-top: 0.5rem;"><i class="fas fa-check-circle"></i> Taken</div>'
+                        }
+                    </div>
+                `;
+                    container.appendChild(medItem);
+                });
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function updateStats() {
+            try {
+                const res = await fetch('/api/compliance?days=7');
+                if (!res.ok) throw new Error('Failed to fetch compliance data');
+                const complianceData = await res.json();
+
+                document.getElementById('complianceRate').textContent = `${complianceData.compliance_percentage}%`;
+                document.getElementById('todayMeds').textContent = complianceData.expected_doses || 0;
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        async function takeMedication(medicationId) {
+            try {
+                const res = await fetch('/take_medication', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ medication_id: medicationId }),
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToast('Medication marked as taken!', 'success');
+                    await loadTodaySchedule();
+                    await updateStats();
+                } else {
+                    throw new Error(data.error || 'Failed to mark medication as taken');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        // --- Medications page ---
+
+        function loadMedications() {
+    fetch('/api/medications')
+        .then(response => response.json())
+        .then(medications => {
+            const medicationsList = document.getElementById('medicationsList');
+            if (!medicationsList) return;
+            
+            // Clear existing medications
+            medicationsList.innerHTML = '';
+            
+            // Sort medications by name
+            medications.sort((a, b) => a.medication_name.localeCompare(b.medication_name));
+            
+            // Create and append new cards
+            medications.forEach(med => {
+                const card = createMedicationCard(med);
+                medicationsList.appendChild(card);
+            });
+
+            // If no medications, show a message
+            if (medications.length === 0) {
+                medicationsList.innerHTML = `
+                    <div class="col-12 text-center">
+                        <p class="text-muted">No medications added yet.</p>
+                    </div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading medications:', error);
+            // Show error message to user
+            const medicationsList = document.getElementById('medicationsList');
+            if (medicationsList) {
+                medicationsList.innerHTML = `
+                    <div class="col-12 text-center">
+                        <p class="text-danger">Error loading medications. Please try again.</p>
+                    </div>`;
+            }
+        });
+}
+
+        function toggleTimeSlot(time, button) {
+            if (selectedTimes.has(time)) {
+                selectedTimes.delete(time);
+                button.style.background = '#f1f5f9';
+                button.style.color = '#64748b';
+            } else {
+                selectedTimes.add(time);
+                button.style.background = 'var(--primary)';
+                button.style.color = 'white';
+            }
+        }
+
+        // Updated add medication submission to send JSON
+        document.getElementById('addMedicationForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            if (selectedTimes.size === 0) {
+                showToast('Please select at least one time slot', 'warning');
+                return;
+            }
+
+            const formData = {
+                medication_name: document.getElementById('medName').value.trim(),
+                dosage: document.getElementById('medDosage').value.trim(),
+                frequency: document.getElementById('medFrequency').value,
+                times: Array.from(selectedTimes),
+                notes: document.getElementById('medNotes').value.trim(),
+            };
+
+            try {
+                const res = await fetch('/add_medication', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    showToast('Medication added successfully!', 'success');
+                    closeModal('addMedicationModal');
+                    this.reset();
+                    selectedTimes.clear();
+                    await loadMedications();
+                } else {
+                    throw new Error(data.error || 'Failed to add medication');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        });
+
+
+        // Add this function in your index.html's <script> tag
+// Replace the existing submitMedicationForm function in your <script> tag
+function submitMedicationForm() {
+    const form = document.getElementById('addMedicationForm');
+    const medicationId = document.getElementById('medicationId').value;
+    
+    // Get selected times
+    const selectedTimeButtons = document.querySelectorAll('#timeSlots button.selected');
+    const times = Array.from(selectedTimeButtons).map(btn => btn.dataset.time);
+
+    const formData = {
+        medication_name: document.getElementById('medName').value.trim(),
+        dosage: document.getElementById('medDosage').value.trim(),
+        frequency: document.getElementById('medFrequency').value,
+        times: times,
+        notes: document.getElementById('medNotes').value.trim(),
+        side_effects: document.getElementById('sideEffects').value.trim(),
+        storage: document.getElementById('storage').value.trim(),
+        refill_date: document.getElementById('refillDate').value
+    };
+
+    // Validation
+    if (!formData.medication_name || !formData.dosage || !formData.frequency) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+    }
+
+    if (times.length === 0) {
+        showToast('Please select at least one time slot', 'error');
+        return;
+    }
+
+    // Show loading spinner
+    showLoadingSpinner();
+
+    const url = medicationId ? 
+        `/api/medications/${medicationId}` : 
+        '/add_medication';
+    const method = medicationId ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(
+                medicationId ? 'Medication updated successfully!' : 
+                'Medication added successfully!',
+                'success'
+            );
+
+            // Reset form and close modal
+            closeModal('addMedicationModal');
+            form.reset();
+            document.getElementById('medicationId').value = '';
+            
+            // Reset time slots
+            const timeSlots = document.querySelectorAll('#timeSlots button');
+            timeSlots.forEach(btn => btn.classList.remove('selected'));
+
+            // Refresh medications list
+            loadMedications();
+        } else {
+            throw new Error(data.error || 'Failed to save medication');
+        }
+    })
+    .catch(error => {
+        showToast('Error: ' + error.message, 'error');
+    })
+    .finally(() => {
+        hideLoadingSpinner();
+    });
+}
+
+        // Rating system
+        document.querySelectorAll('.rating').forEach((rating) => {
+            const stars = rating.querySelectorAll('.star');
+            const ratingType = rating.dataset.rating;
+
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    const value = parseInt(star.dataset.value);
+                    medicationRatings[ratingType] = value;
+
+                    stars.forEach((s, i) => {
+                        if (i < value) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+
+        // Symptoms form submission
+        document.getElementById('symptomsForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const symptomsData = {
+                mood: medicationRatings.mood,
+                energy_level: medicationRatings.energy,
+                pain_level: medicationRatings.pain,
+                side_effects: document
+                    .getElementById('sideEffects')
+                    .value.split(',')
+                    .map((s) => s.trim())
+                    .filter((s) => s),
+                notes: document.getElementById('symptomsNotes').value.trim(),
+            };
+
+            try {
+                const res = await fetch('/log_symptoms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(symptomsData),
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    showToast('Symptoms logged successfully!', 'success');
+                    this.reset();
+                    document.querySelectorAll('.star').forEach((star) => star.classList.remove('active'));
+                    medicationRatings = { mood: 0, energy: 0, pain: 0 };
+                } else {
+                    throw new Error(data.error || 'Failed to log symptoms');
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        });
+
+        // Pharmacy search
+        async function searchPharmacies() {
+            const medication = document.getElementById('medicationSearch').value.trim();
+            if (!medication) {
+                showToast('Please enter a medication name', 'warning');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/search_pharmacies?medication=${encodeURIComponent(medication)}`);
+                if (!res.ok) throw new Error('Failed to fetch pharmacies');
+                const pharmacies = await res.json();
+
+                displayPharmacyResults(pharmacies, medication);
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        }
+
+        function displayPharmacyResults(results, medication) {
+            const container = document.getElementById('pharmacyResults');
+            container.innerHTML = `<h4 style="margin-bottom: 1rem; color: var(--primary);">Results for "${medication}":</h4>`;
+
+            results.forEach((pharmacy) => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'pharmacy-result';
+                resultDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4 style="color: var(--primary); margin-bottom: 0.5rem;">${pharmacy.name}</h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${pharmacy.address}</p>
+                            <p><i class="fas fa-phone"></i> ${pharmacy.phone}</p>
+                            ${pharmacy.delivery_available ? '<p><i class="fas fa-truck" style="color: var(--success);"></i> Delivery Available</p>' : ''}
+                        </div>
+                        <div style="text-align: right;">
+                            <button class="btn btn-primary" style="margin-bottom: 0.5rem;" onclick="callPhone('${pharmacy.phone}')">
+                                <i class="fas fa-phone"></i> Call
+                            </button>
+                            <br>
+                            <button class="btn btn-success" onclick="orderMedication('${pharmacy.name}')">
+                                <i class="fas fa-shopping-cart"></i> Order
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(resultDiv);
+            });
+        }
+
+        function callPhone(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+
+        function orderMedication(pharmacyName) {
+            showToast(`Order functionality for ${pharmacyName} coming soon!`, 'warning');
+        }
+
+        // Toast notifications function
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Emergency functions
+        function callEmergency() {
+            window.location.href = 'tel:911';
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function (event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach((modal) => {
+                if (event.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            showPage('home');
+             initializeTimeSlots();
+        //load meds if we r on the medications page
+        if (document.getElementById('medications')) {
+            loadMedications();
+        }
+        });
+//yahan se 
+        // Update the initializeTimeSlots function in your <script> tag
+function initializeTimeSlots() {
+    const timeSlots = document.getElementById('timeSlots');
+    if (!timeSlots) return;
+
+    timeSlots.innerHTML = '';
+    selectedTimes = new Set();
+
+    // Generate time slots from 00:00 to 23:30
+    for (let hour = 0; hour < 24; hour++) {
+        for (let minute of ['00', '30']) {
+            const time = `${hour.toString().padStart(2, '0')}:${minute}`;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'time-slot-btn';
+            button.dataset.time = time;
+            button.textContent = time;
+            
+            // Add click handler with visual feedback
+            button.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                if (this.classList.contains('selected')) {
+                    selectedTimes.add(time);
+                    // Add ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    this.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 600);
+                } else {
+                    selectedTimes.delete(time);
+                }
+            });
+            
+            timeSlots.appendChild(button);
+        }
+    }
+}
+
+// Add ripple effect style to your existing CSS
+const style = document.createElement('style');
+style.textContent = `
+    .ripple {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
+        margin-left: -50px;
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+    }
+    
+    @keyframes ripple {
+        from {
+            transform: scale(0);
+            opacity: 1;
+        }
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style); //yahan tk 
+
+        // Poll dashboard data every 30 seconds
+        setInterval(() => {
+            if (currentUser && document.getElementById('dashboard').classList.contains('active')) {
+                loadDashboardData();
+            }
+        }, 30000);
+
+       
+    
+    </script>
+</body>
+</html>
